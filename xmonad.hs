@@ -15,7 +15,9 @@ myLayout = tiled ||| Mirror tiled ||| Full
          where tiled = spacing 5 $ Tall nmaster delta ratio  
                nmaster = 2  
                ratio = 3/5  
-               delta = 5/100  
+               delta = 5/100 
+
+myWorkspaces = ["1:main", "2:programming" ,"3:web" , "4"]
 
 main = do 
        spawn "xcompmgr"
@@ -27,8 +29,10 @@ main = do
               , focusedBorderColor = "#456def"
 	      , layoutHook = avoidStruts myLayout
 	      , logHook = dynamicLogWithPP (prettyPrinter dbus)
+	      , workspaces = myWorkspaces
 	      }
 
+-- Settings for xmonad-log-applet
 
 prettyPrinter :: D.Client -> PP
 prettyPrinter dbus = defaultPP
@@ -36,9 +40,9 @@ prettyPrinter dbus = defaultPP
     , ppTitle    = pangoSanitize
     , ppCurrent  = pangoColor "green" . wrap "[" "]" . pangoSanitize
     , ppVisible  = pangoColor "yellow" . wrap "(" ")" . pangoSanitize
-    , ppHidden   = const ""
+    , ppHidden   = pangoColor "yellow" . wrap "(" ")" . pangoSanitize
     , ppUrgent   = pangoColor "red"
-    , ppLayout   = const ""
+    , ppLayout   = pangoColor "cyan" . wrap "{" "}" . pangoSanitize
     , ppSep      = " "
     }
 
