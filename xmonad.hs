@@ -6,6 +6,7 @@ import XMonad.Hooks.ManageDocks
 import XMonad.Layout.Spacing
 
 import XMonad.Hooks.DynamicLog
+import XMonad.Hooks.ManageHelpers
 
 import qualified DBus.Client.Simple as D
 import qualified Codec.Binary.UTF8.String as UTF8
@@ -19,6 +20,11 @@ myLayout = tiled ||| Mirror tiled ||| Full
 
 myWorkspaces = ["1:main", "2:programming" ,"3:web" , "4"]
 
+myManageHook = composeAll 
+       [ className =? "Xfce4-appfinder" --> doCenterFloat
+       , className =? "Xfrun4"          --> doCenterFloat
+       ]
+
 main = do 
        spawn "xcompmgr"
        dbus <- D.connectSession
@@ -30,6 +36,7 @@ main = do
 	      , layoutHook = avoidStruts myLayout
 	      , logHook = dynamicLogWithPP (prettyPrinter dbus)
 	      , workspaces = myWorkspaces
+	      , manageHook = myManageHook <+> manageHook xfceConfig
 	      }
 
 -- Settings for xmonad-log-applet
@@ -42,7 +49,7 @@ prettyPrinter dbus = defaultPP
     , ppVisible  = pangoColor "yellow" . wrap "(" ")" . pangoSanitize
     , ppHidden   = pangoColor "yellow" . wrap "(" ")" . pangoSanitize
     , ppUrgent   = pangoColor "red"
-    , ppLayout   = pangoColor "cyan" . wrap "{" "}" . pangoSanitize
+    , ppLayout   = const "" --pangoColor "cyan" . wrap "{" "}" . pangoSanitize
     , ppSep      = " "
     }
 
