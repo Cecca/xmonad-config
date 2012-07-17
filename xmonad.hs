@@ -4,6 +4,10 @@ import XMonad
 import XMonad.Config.Xfce
 import XMonad.Hooks.ManageDocks
 import XMonad.Layout.Spacing
+import XMonad.Layout.IM
+import XMonad.Layout.Grid
+import XMonad.Layout.PerWorkspace
+import XMonad.Util.EZConfig
 
 import XMonad.Hooks.DynamicLog
 import XMonad.Hooks.ManageHelpers
@@ -12,32 +16,43 @@ import qualified DBus.Client.Simple as D
 import qualified Codec.Binary.UTF8.String as UTF8
 
 
-myLayout = tiled ||| Mirror tiled ||| Full  
+myLayout = onWorkspace "4:messaging" messagingLayout $ tiled ||| Mirror tiled ||| Full  
          where tiled = spacing 5 $ Tall nmaster delta ratio  
-               nmaster = 2  
+               nmaster = 1  
                ratio = 3/5  
                delta = 5/100 
+	       gridLayout = spacing 5 $ Grid
+	       messagingLayout = withIM (18/100) (Role "buddy_list") gridLayout
 
-myWorkspaces = ["1:main", "2:programming" ,"3:web" , "4"]
+myWorkspaces = ["1:main", "2:programming" ,"3:web" , "4:messaging", "5"]
 
 myManageHook = composeAll 
        [ className =? "Xfce4-appfinder" --> doCenterFloat
        , className =? "Xfrun4"          --> doCenterFloat
+       , className =? "Pidgin"          --> doShift "4:messaging"
+       , className =? "Xfce4-notifyd"	--> doIgnore
        ]
+
+myAdditionalKeys = [ ((mod4Mask, xK_f), spawn "firefox") 
+                   , ((mod4Mask, xK_t), spawn "Terminal")
+		   , ((mod4Mask, xK_m), spawn "Terminal -e mutt")
+                   ]
 
 main = do 
        spawn "xcompmgr"
        dbus <- D.connectSession
        getWellKnownName dbus
-       xmonad xfceConfig
-              { borderWidth = 1
+       xmonad $ xfceConfig
+              { modMask = mod4Mask
+	      , terminal = "Terminal"
+	      , borderWidth = 1
 	      , normalBorderColor = "#abc123"  
               , focusedBorderColor = "#456def"
 	      , layoutHook = avoidStruts myLayout
 	      , logHook = dynamicLogWithPP (prettyPrinter dbus)
 	      , workspaces = myWorkspaces
 	      , manageHook = myManageHook <+> manageHook xfceConfig
-	      }
+	      } `additionalKeys` myAdditionalKeys
 
 -- Settings for xmonad-log-applet
 
