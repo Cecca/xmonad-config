@@ -15,6 +15,8 @@ import XMonad.Hooks.ManageHelpers
 import qualified DBus.Client.Simple as D
 import qualified Codec.Binary.UTF8.String as UTF8
 
+import Data.Ratio ((%))
+
 
 myLayout = onWorkspace "4:messaging" messagingLayout $ tiled ||| Mirror tiled ||| Full  
          where tiled = spacing 5 $ Tall nmaster delta ratio  
@@ -22,7 +24,7 @@ myLayout = onWorkspace "4:messaging" messagingLayout $ tiled ||| Mirror tiled ||
                ratio = 3/5  
                delta = 5/100 
 	       gridLayout = spacing 5 $ Grid
-	       messagingLayout = withIM (18/100) (Role "buddy_list") gridLayout
+	       messagingLayout = withIM (21 % 100) (Role "buddy_list") gridLayout
 
 myWorkspaces = ["1:main", "2:programming" ,"3:web" , "4:messaging", "5"]
 
@@ -36,6 +38,7 @@ myManageHook = composeAll
 myAdditionalKeys = [ ((mod4Mask, xK_f), spawn "firefox") 
                    , ((mod4Mask, xK_t), spawn "Terminal")
 		   , ((mod4Mask, xK_m), spawn "Terminal -e mutt")
+                   , ((mod4Mask .|. shiftMask , xK_m), spawn "Terminal -e ncmpcpp")
                    ]
 
 main = do 
